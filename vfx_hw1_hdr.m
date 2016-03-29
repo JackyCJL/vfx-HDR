@@ -34,7 +34,7 @@ function hdr = vfx_hw1_hdr(file_path, lambda)
     for color = 1:color_n
         for i = 1:row
             for j = 1:col
-                hdr(i,j,color) = exp( g(rgb{ceil(picture/2)}(i,j,color)-log_time(ceil(picture/2))) );
+                hdr(i,j,color) = exp( g(color,rgb{ceil(picture/2)}(i,j,color)+1)-log_time(ceil(picture/2)) );
             end
         end
     end
@@ -49,6 +49,7 @@ function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
     i = 1;
     sample_n = 100;
     n = 256;
+    g = zeros(3,n);
  
     while i <= sample_n
         sample = ceil(rand()*pixels);
@@ -91,7 +92,7 @@ function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
             k=k+1;
         end
         x = A\b;
-        g = x(1:n);
+        g(color,1:n) = x(1:n);
         lE = x(n+1:size(x,1));
     end
 end
