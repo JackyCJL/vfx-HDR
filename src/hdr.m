@@ -1,7 +1,7 @@
-function [hdr, g] = vfx_hw1_hdr(file_path, lambda)
+function [hdr, g] = hdr(file_path, lambda)
     rgb = {};
-    files_1 = dir([file_path '\*.JPG']);
-    files_2 = dir([file_path '\*.png']);
+    files_1 = dir([file_path '/*.JPG']);
+    files_2 = dir([file_path '/*.png']);
     use_jpg = 1;
     if size(files_1, 1) > 0
        files = files_1;
@@ -13,13 +13,14 @@ function [hdr, g] = vfx_hw1_hdr(file_path, lambda)
     exp_time = [];
     file_names = {};
     for i = 1:size(files,1)   
-        file_names(i) = {[file_path '\' files(i).name]};
-        rgb(i) = {imread([file_path '\' files(i).name])};
-        iminfo = imfinfo([file_path '\' files(i).name]);
+        file_names(i) = {[file_path '/' files(i).name]};
+        rgb(i) = {double(imread([file_path '/' files(i).name]))};
+        iminfo = imfinfo([file_path '/' files(i).name]);
         if use_jpg == 1 
             exp_time(i) = iminfo.DigitalCamera.ExposureTime;
         end
     end
+
     [row,col,color_n] =  size(rgb{1});
     if use_jpg == 0
         exp_time = [1/0.03125, 1/0.0625, 1/0.125, 1/0.25, 1/0.5, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128, 1/256, 1/512, 1/1024 ];
