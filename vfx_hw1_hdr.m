@@ -34,7 +34,17 @@ function hdr = vfx_hw1_hdr(file_path, lambda)
     for color = 1:color_n
         for i = 1:row
             for j = 1:col
-                hdr(i,j,color) = exp( g(color,rgb{ceil(picture/2)}(i,j,color)+1)-log_time(ceil(picture/2)) );
+                g_sum = double(0);
+                w_sum = double(0);
+                for p = 1:picture
+                    g_sum = g_sum+ weight(rgb{p}(i,j,color))*(g(color,rgb{p}(i,j,color)+1)-log_time(p));
+                    w_sum = w_sum + weight(rgb{p}(i,j,color)); 
+                end
+                if w_sum == 0
+                    hdr(i,j,color) = 0;
+                else
+                    hdr(i,j,color) = exp(g_sum/w_sum);
+                end
             end
         end
     end
@@ -98,25 +108,13 @@ function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
 end
 
 function w = weight(z)
-    zmin = 1;
-    zmax = 256;
+    zmin = 0;
+    zmax = 255;
     average = (zmin+zmax)/2;
     if z >= average
-        w = zmax - z;
+        w = double(zmax - z);
     else
-        w = z - zmin;
-    end
-end
-    
-function out = fibo(n)
-    if n==1
-        out=0;
-        return;
-    elseif n==2
-        out=1;
-        return;
-    else
-        out=fibo(n-1)+fibo(n-2);
+        w = double(z - zmin);
     end
 end
     
