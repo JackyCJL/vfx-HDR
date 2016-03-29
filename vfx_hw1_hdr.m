@@ -1,4 +1,4 @@
-function hdr = vfx_hw1_hdr(file_path, lambda)
+function [hdr, g] = vfx_hw1_hdr(file_path, lambda)
     rgb = {};
     files_1 = dir([file_path '\*.JPG']);
     files_2 = dir([file_path '\*.png']);
@@ -31,23 +31,25 @@ function hdr = vfx_hw1_hdr(file_path, lambda)
     picture = size(files,1);
     [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time);
     hdr = zeros(row,col,color_n);
+
     for color = 1:color_n
-        for i = 1:row
-            for j = 1:col
-                g_sum = double(0);
-                w_sum = double(0);
-                for p = 1:picture
-                    g_sum = g_sum+ weight(rgb{p}(i,j,color))*(g(color,rgb{p}(i,j,color)+1)-log_time(p));
-                    w_sum = w_sum + weight(rgb{p}(i,j,color)); 
-                end
-                if w_sum == 0
-                    hdr(i,j,color) = 0;
-                else
-                    hdr(i,j,color) = exp(g_sum/w_sum);
+            for i = 1:row
+                for j = 1:col
+                    g_sum = double(0);
+                    w_sum = double(0);
+                    for p = 1:picture
+                        g_sum = g_sum+ weight(rgb{p}(i,j,color))*(g(color,rgb{p}(i,j,color)+1)-log_time(p));
+                        w_sum = w_sum + weight(rgb{p}(i,j,color)); 
+                    end
+                    if w_sum == 0
+                        hdr(i,j,color) = 0;
+                    else
+                        hdr(i,j,color) = exp(g_sum/w_sum);
+                    end
                 end
             end
-        end
     end
+
 end
 
 function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
@@ -60,15 +62,18 @@ function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
     sample_n = 100;
     n = 256;
     g = zeros(3,n);
- 
-    while i <= sample_n
-        sample = ceil(rand()*pixels);
-        if z_bool(1,sample) == 1;
-            continue
-        else
-            z_bool(1,sample) = 1;
-            z_vector(i) = sample;
-            i = i + 1;            
+    n_sq = ceil(sqrt(sample_n));
+    k=1;
+    for i = 1:n_sq
+        for j = 1:n_sq
+            z_vector(k) = i*floor(row/n_sq)*col + j*floor(col/n_sq);
+            k = k+1;
+            if k > 100
+                break
+            end
+        end
+        if k > 100
+            break
         end
     end
     for color = 1:color_n
@@ -105,6 +110,11 @@ function [g, lE]  = calculate_g(row, col, picture, lambda, rgb, log_time)
         g(color,1:n) = x(1:n);
         lE = x(n+1:size(x,1));
     end
+    z = 0:1:255;
+    y1 = g(1,z+1);
+    y2 = g(2,z+1);
+    y3 = g(3,z+1);
+    plot(y1,z,y2,z,y3,z);
 end
 
 function w = weight(z)
