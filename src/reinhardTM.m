@@ -1,7 +1,7 @@
 function imgOut = reinhardTM(imgIn,isLocalTM,key,delta,white,gamma,threshold,phi,num,low,high)
 
-if(~exist('isLocalTM)','var'))
-	isLocalTM=true;
+if(~exist('isLocalTM','var'))
+	isLocalTM = false;
 end
 
 if(~exist('key','var'))
@@ -40,6 +40,8 @@ if(~exist('high','var'))
 	high = 43;
 end
 
+
+
 R = imgIn(:,:,1);
 G = imgIn(:,:,2);
 B = imgIn(:,:,3);
@@ -49,7 +51,7 @@ Lw = exp( mean( mean( log( delta + imgIn ) ) ) );
 L = key / Lw .* imgIn;
 
 
-if(isLocalTM)
+if(isLocalTM == true)
 	alpha = 1;
 	kernelHalfRange = alpha * 5;
 	V1 = cyclicGaussianFilter(L,alpha,kernelHalfRange);
